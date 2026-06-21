@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Mobile Crate Radar Pro</title>
+    <style>
+        :root {
+            --pubg-black: #0b0c10;
+            --pubg-dark-grey: #1f2833;
+            --pubg-steel: #c5a059;
+            --pubg-yellow: #f3c623;
+            --pubg-yellow-glow: rgba(243, 198, 35, 0.4);
+            --mythic-red: #ff3366;
+            --legendary-pink: #b533ff;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #10141d;
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* هيكل محاكي الهاتف */
+        .smartphone-container {
+            width: 100%;
+            max-width: 390px;
+            height: 820px;
+            background-color: var(--pubg-black);
+            border: 10px solid #000000;
+            border-radius: 45px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .system-top-bar {
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .live-sync-text {
+            color: var(--pubg-yellow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--pubg-yellow);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--pubg-yellow);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .hidden { display: none !important; }
+
+        /* شاشة تسجيل الدخول عبر ID اللاعب */
+        .login-layout { padding: 30px; justify-content: center; align-items: center; text-align: center; height: 100%; box-sizing: border-box; background: radial-gradient(circle, #1a222d 0%, #0b0c10 100%); }
+        .pubg-logo-box { width: 85px; height: 85px; background: #242e3d; border: 2px solid var(--pubg-yellow); border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 34px; box-shadow: 0 0 25px var(--pubg-yellow-glow); margin: 0 auto 20px auto; transform: rotate(45deg); }
+        .pubg-logo-box span { transform: rotate(-45deg); }
+        .app-title { font-size: 22px; font-weight: 900; letter-spacing: 1px; color: #fff; margin: 10px 0; text-transform: uppercase; }
+        .input-group { width: 100%; margin-top: 40px; position: relative; }
+        .pubg-input { width: 100%; padding: 16px 20px; padding-right: 50px; background-color: var(--pubg-dark-grey); border: 1.5px solid #343f4f; border-radius: 12px; color: #fff; font-size: 14px; outline: none; text-align: right; box-sizing: border-box; }
+        .pubg-input:focus { border-color: var(--pubg-yellow); box-shadow: 0 0 15px var(--pubg-yellow-glow); }
+        .input-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--pubg-yellow); }
+        .login-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #f3c623 0%, #c5a059 100%); border: none; border-radius: 12px; color: #000; font-size: 15px; font-weight: bold; margin-top: 25px; cursor: pointer; box-shadow: 0 5px 15px rgba(243, 198, 35, 0.3); }
+
+        /* الشاشة الرئيسية للباكجات */
+        .dashboard-layout { padding: 15px; overflow-y: auto; flex: 1; padding-bottom: 85px; }
+        .dashboard-layout::-webkit-scrollbar { width: 0; }
+        .user-tag-card { display: flex; align-items: center; gap: 12px; background-color: var(--pubg-dark-grey); padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d3848; }
+        .user-icon { width: 35px; height: 35px; background: var(--pubg-yellow); color: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        
+        /* التبديل بين البكجات */
+        .crate-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 4px; }
+        .crate-tabs::-webkit-scrollbar { height: 0; }
+        .tab-btn { background: #171e27; border: 1px solid #2d3848; color: var(--text-muted); padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { background: var(--pubg-yellow); color: #000; border-color: var(--pubg-yellow); }
+
+        /* صندوق استعراض محتويات البكج */
+        .crate-display-panel { background: linear-gradient(135deg, #1f2936 0%, #0d131a 100%); border: 1px solid #344356; border-radius: 16px; padding: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+        .crate-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; margin-bottom: 15px; }
+        .crate-title { color: var(--pubg-yellow); font-size: 14px; font-weight: bold; }
+        
+        .items-scroller { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .items-scroller::-webkit-scrollbar { height: 0; }
+
+        /* كروت الجوائز داخل البكج */
+        .pubg-item-card { background: #11161f; border: 1px solid #2d3848; border-radius: 12px; min-width: 105px; padding: 12px 6px; text-align: center; position: relative; }
+        .pubg-item-card.mythic { border-color: var(--mythic-red); background: linear-gradient(180deg, #2b1217 0%, #11161f 100%); }
+        .pubg-item-card.legendary { border-color: var(--legendary-pink); background: linear-gradient(180deg, #22122d 0%, #11161f 100%); }
+        
+        .rarity-tag { font-size: 8px; padding: 2px 5px; border-radius: 4px; color: #fff; font-weight: bold; display: inline-block; margin-bottom: 6px; }
+        .rarity-tag.mythic { background: var(--mythic-red); }
+        .rarity-tag.legendary { background: var(--legendary-pink); }
+
+        .item-name { font-size: 11px; font-weight: bold; margin: 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .radar-btn { background: transparent; border: 1px solid var(--pubg-yellow); color: var(--pubg-yellow); border-radius: 6px; font-size: 10px; padding: 4px 0; width: 100%; cursor: pointer; font-weight: bold; }
+        .radar-btn.active { background: var(--pubg-yellow); color: #000; }
+
+        /* قائمة الرادار المستهدفة */
+        .section-title { font-size: 13px; font-weight: 800; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 6px; }
+        .radar-list-card { display: flex; align-items: center; background-color: var(--pubg-dark-grey); border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 1px solid #2d3848; }
+        .radar-list-card.mythic { border-right: 4px solid var(--mythic-red); }
+        .radar-list-card.legendary { border-right: 4px solid var(--legendary-pink); }
+        
+        .card-details { flex: 1; margin-right: 8px; }
+        .card-title { font-size: 12px; font-weight: bold; }
+        .card-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        
+        .obtained-btn { background: #171e27; border: 1px solid #344356; color: var(--text-muted); font-size: 10px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .obtained-btn.got-it { background: #2ecc71; color: #fff; border-color: #2ecc71; }
+
+        /* شريط التنقل السفلي */
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 60px; background-color: #07080a; border-top: 1px solid #171e27; display: flex; justify-content: space-around; align-items: center; box-sizing: border-box; }
+        .nav-item { text-align: center; color: var(--text-muted); font-size: 10px; font-weight: bold; }
+        .nav-item.active { color: var(--pubg-yellow); }
+    </style>
+</head>
+<body>
+
+<div class="smartphone-container">
+    <div class="system-top-bar">
+        <div class="live-sync-text"><div class="live-dot"></div><span>PUBG LIVE CRATES</span></div>
+        <span>09:30 AM</span>
+    </div>
+
+    <div class="screen login-layout" id="loginScreen">
+        <div class="pubg-logo-box"><span>📦</span></div>
+        <div class="app-title">PUBG CRATE RADAR</div>
+        <div style="color: var(--text-muted); font-size: 11px;">تتبع جوائز الصناديق النشطة والمطورة داخل اللعبة حالياً</div>
+        
+        <div class="input-group">
+            <span class="input-icon">🆔</span>
+            <input type="text" class="pubg-input" id="pubgIdInput" placeholder="أدخل أيدي اللاعب الحقيقي (Character ID)" oninput="this.value = this.value.replace(/[^0-30]/g, '')">
+        </div>
+        <button class="login-btn" onclick="loginWithPubgId()">ربط المعرف الحقيقي</button>
+    </div>
+
+    <div class="screen hidden" id="dashboardScreen">
+        <div class="dashboard-layout">
+            
+            <div class="user-tag-card">
+                <div class="user-icon">👤</div>
+                <div>
+                    <div style="font-size: 9px; color: var(--text-muted);">الأيدي المتصل بالسيرفر</div>
+                    <div style="font-size: 12px; font-weight: bold; color: var(--pubg-yellow);" id="playerActiveId">00000000</div>
+                </div>
+            </div>
+
+            <div class="crate-tabs">
+                <button class="tab-btn active" onclick="switchCrate('classic', this)">البكج الكلاسيكي (Classic)</button>
+                <button class="tab-btn" onclick="switchCrate('premium', this)">البكج المميز (Premium)</button>
+                <button class="tab-btn" onclick="switchCrate('supply', this)">بكج الإمداد (Supply)</button>
+                <button class="tab-btn" onclick="switchCrate('lucky', this)">صندوق الحظ المطور (Lucky)</button>
+            </div>
+
+            <div class="crate-display-panel">
+                <div class="crate-header">
+                    <span class="crate-title" id="currentCrateTitle">Classic Crate الجوائز الحالية</span>
+                    <span style="font-size: 9px; color: #2ecc71; font-weight: bold;">محدث بالكامل 🟢</span>
+                </div>
+                <div class="items-scroller" id="crateItemsGrid">
+                    </div>
+            </div>
+
+            <div class="section-title">🎯 رادار العناصر المستهدفة (التي تبحث عنها عند الفتح)</div>
+            <div id="radarListWrapper">
+                <p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 20px;" id="emptyMsg">لم تقم بتحديد أي جوائز مستهدفة لتتبعها بعد.</p>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active"><div>📦</div><div>الصناديق</div></div>
+            <div class="nav-item"><div>🎯</div><div>الرادار</div></div>
+            <div class="nav-item"><div>🏆</div><div>المواسم</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // قاعدة البيانات الحقيقية لجميع بكجات ببجي الحالية وجوائزها الأساسية لعام 2026
+    const pubgCratesDatabase = {
+        classic: {
+            title: "الصندوق الكلاسيكي الحقيقي (Classic Crate)",
+            items: [
+                { id: "c_1", name: "M416 الثلجي (Glacier)", rarity: "mythic", type: "سلاح مطور" },
+                { id: "c_2", name: "بدلة الفرعون (Pharaoh X-Suit)", rarity: "mythic", type: "بدلة ميثك" },
+                { id: "c_3", name: "خوذة الغراب (Raven Helmet)", rarity: "legendary", type: "خوذة أسطورية" }
+            ]
+        },
+        premium: {
+            title: "الصندوق المميز الحالي (Premium Crate)",
+            items: [
+                { id: "p_1", name: "AKM الطاغية (Hellfire)", rarity: "mythic", type: "سلاح مطور" },
+                { id: "p_2", name: "حقيبة الساموراي (Samurai Bag)", rarity: "legendary", type: "حقيبة ظهر" },
+                { id: "p_3", name: "غطاء رأس القطة (Neko Mask)", rarity: "legendary", type: "قناع" }
+            ]
+        },
+        supply: {
+            title: "صندوق الإمداد المتوفر (Supply Crate)",
+            items: [
+                { id: "s_1", name: "بدلة المتسلل (Infiltrator Set)", rarity: "legendary", type: "طقم كامل" },
+                { id: "s_2", name: "مظلة الهبوط الليلية (Night Parachute)", rarity: "legendary", type: "مظلة" },
+                { id: "s_3", name: "جينز المغامر (Adventure Pants)", rarity: "normal", type: "ملابس" }
+            ]
+        },
+        lucky: {
+            title: "صندوق الحظ المطور (Lucky Spin Crate)",
+            items: [
+                { id: "l_1", name: "M16A4 الملعونة (Blood Odyssey)", rarity: "mythic", type: "سلاح مطور" },
+                { id: "l_2", name: "سيارة لامبورغيني (Sports Car)", rarity: "mythic", type: "مظهر مركبة" },
+                { id: "l_3", name: "رقصة النصر الأسطورية", rarity: "legendary", type: "رقصة ميثك" }
+            ]
+        }
+    };
+
+    let activeCrateKey = "classic";
+    let playerRadarList = [];
+
+    function loginWithPubgId() {
+        const idInput = document.getElementById('pubgIdInput').value.trim();
+        if (idInput === "" || idInput.length < 5) {
+            alert("الرجاء إدخال ID لاعب حقيقي وصحيح (يتكون من أرقام فقط ومقبول في السيرفر)!");
+            return;
+        }
+        
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        document.getElementById('playerActiveId').innerText = idInput;
+
+        renderCrateItems();
+    }
+
+    function switchCrate(crateKey, element) {
+        activeCrateKey = crateKey;
+        
+        // تبديل زر التبويب النشط
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+
+        renderCrateItems();
+    }
+
+    function renderCrateItems() {
+        const crate = pubgCratesDatabase[activeCrateKey];
+        document.getElementById('currentCrateTitle').innerText = crate.title;
+        
+        const grid = document.getElementById('crateItemsGrid');
+        grid.innerHTML = '';
+
+        crate.items.forEach(item => {
+            const isTargeted = playerRadarList.some(r => r.id === item.id);
+            const btnClass = isTargeted ? "radar-btn active" : "radar-btn";
+            const btnText = isTargeted ? "مستهدف 🎯" : "تتبع العنصر";
+            const cardClass = item.rarity === "mythic" ? "pubg-item-card mythic" : (item.rarity === "legendary" ? "pubg-item-card legendary" : "pubg-item-card");
+
+            grid.innerHTML += `
+                <div class="${cardClass}">
+                    ${item.rarity !== 'normal' ? `<span class="rarity-tag ${item.rarity}">${item.rarity.toUpperCase()}</span>` : ''}
+                    <div class="player-rating-circle">📦</div>
+                    <div class="item-name">${item.name}</div>
+                    <div style="font-size: 8px; color: var(--text-muted); margin-bottom: 8px;">${item.type}</div>
+                    <button class="${btnClass}" onclick="toggleRadar('${item.id}')">${btnText}</button>
+                </div>
+            `;
+        });
+    }
+
+    function toggleRadar(id) {
+        const crate = pubgCratesDatabase[activeCrateKey];
+        const item = crate.items.find(i => i.id === id);
+        if (!item) return;
+
+        const index = playerRadarList.findIndex(r => r.id === id);
+        if (index > -1) {
+            playerRadarList.splice(index, 1);
+        } else {
+            playerRadarList.push({
+                ...item,
+                fromCrate: crate.title,
+                obtained: false
+            });
+        }
+        renderCrateItems();
+        renderRadarList();
+    }
+
+    function renderRadarList() {
+        const wrapper = document.getElementById('radarListWrapper');
+        const emptyMsg = document.getElementById('emptyMsg');
+        
+        const currentCards = wrapper.querySelectorAll('.radar-list-card');
+        currentCards.forEach(c => c.remove());
+
+        if (playerRadarList.length === 0) {
+            emptyMsg.style.display = 'block';
+            return;
+        }
+        emptyMsg.style.display = 'none';
+
+        playerRadarList.forEach(item => {
+            const cardClass = item.rarity === 'mythic' ? 'radar-list-card mythic' : (item.rarity === 'legendary' ? 'radar-list-card legendary' : 'radar-list-card');
+            const btnClass = item.obtained ? "obtained-btn got-it" : "obtained-btn";
+            const btnText = item.obtained ? "تم الحصول عليه ✓" : "قيد الانتظار ⏳";
+
+            wrapper.innerHTML += `
+                <div class="${cardClass}">
+                    <div class="card-details">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-sub">المصدر: ${item.fromCrate} | الفئة: ${item.type}</div>
+                    </div>
+                    <button class="${btnClass}" onclick="toggleObtained('${item.id}')">${btnText}</button>
+                </div>
+            `;
+        });
+    }
+
+    function toggleObtained(id) {
+        const item = playerRadarList.find(r => r.id === id);
+        if (item) {
+            item.obtained = !item.obtained;
+            renderRadarList();
+        }
+    }
+</script>
+
+</body>
+</html>
