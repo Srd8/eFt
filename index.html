@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFootball Epic Radar Pro</title>
+    <style>
+        :root {
+            --bg-dark: #060913;
+            --bg-surface: #0f1526;
+            --bg-card: #172037;
+            --epic-gold: #f1c40f;
+            --epic-gold-glow: rgba(241, 196, 15, 0.4);
+            --neon-green: #00ffaa;
+            --neon-green-glow: rgba(0, 255, 170, 0.3);
+            --danger: #ff3366;
+            --text-main: #ffffff;
+            --text-muted: #7e8da6;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #131929;
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* هيكل الهاتف الذكي الاحترافي */
+        .smartphone-container {
+            width: 100%;
+            max-width: 390px;
+            height: 800px;
+            background-color: var(--bg-dark);
+            border: 10px solid #000000;
+            border-radius: 45px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* شريط النظام العلوى */
+        .system-top-bar {
+            height: 45px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .live-server-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green-glow);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-green);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* الشاشات الرئيسية */
+        .screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 1. تصميم شاشة تسجيل الدخول الخرافية */
+        .login-layout {
+            padding: 30px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .logo-glow-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .logo-circle {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, #1a263f 0%, #0c1322 100%);
+            border: 2px solid var(--epic-gold);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 38px;
+            box-shadow: 0 0 25px var(--epic-gold-glow);
+            margin: 0 auto;
+        }
+
+        .app-main-title {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .konami-input {
+            width: 100%;
+            padding: 16px 20px;
+            padding-right: 50px;
+            background-color: var(--bg-surface);
+            border: 1.5px solid #1e2942;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            text-align: right;
+        }
+
+        .konami-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green-glow);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--neon-green);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            border: none;
+            border-radius: 16px;
+            color: #000;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 2. تصميم الواجهة الرئيسية الفخمة */
+        .dashboard-layout {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 85px;
+        }
+
+        .dashboard-layout::-webkit-scrollbar { width: 0; }
+
+        .user-welcome-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--bg-surface);
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #162035;
+        }
+
+        .user-avatar-small {
+            width: 35px;
+            height: 35px;
+            background: var(--neon-green);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .section-header {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 20px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* لوحة البكج النشط */
+        .pack-hero-panel {
+            background: linear-gradient(135deg, #131d31 0%, #070b14 100%);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .pack-meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .pack-title-text {
+            color: var(--epic-gold);
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+        }
+
+        .pack-status-tag {
+            background: rgba(0, 255, 170, 0.1);
+            color: var(--neon-green);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(0, 255, 170, 0.15);
+        }
+
+        /* هيدر الكروت الأفقية */
+        .horizontal-players-scroller {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .horizontal-players-scroller::-webkit-scrollbar { height: 0; }
+
+        /* كارت اللاعب الـ Epic الأسطوري */
+        .epic-premium-card {
+            background: linear-gradient(180deg, #241c0e 0%, #0b0906 100%);
+            border: 1.5px solid var(--epic-gold);
+            border-radius: 16px;
+            min-width: 105px;
+            padding: 12px 6px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .card-glow-effect {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 16px;
+            box-shadow: inset 0 0 15px var(--epic-gold-glow);
+            pointer-events: none;
+        }
+
+        .player-rating-circle {
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            color: #000;
+            font-weight: 900;
+            font-size: 11px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px auto;
+            box-shadow: 0 0 10px var(--epic-gold);
+        }
+
+        .player-position-badge {
+            font-size: 9px;
+            background: rgba(255,255,255,0.08);
+            padding: 2px 6px;
+            border-radius: 5px;
+            color: var(--epic-gold);
+            font-weight: bold;
+        }
+
+        .player-main-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 8px 0 12px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .radar-add-btn {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            border-radius: 8px;
+            font-size: 10px;
+            padding: 5px 0;
+            width: 90%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .radar-add-btn.active {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--neon-green-glow);
+        }
+
+        /* قائمة الرادار المستهدفة */
+        .radar-list-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-surface);
+            border-radius: 16px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-right: 4px solid var(--epic-gold);
+            border: 1px solid #162035;
+            border-right: 4px solid var(--epic-gold);
+        }
+
+        .radar-list-item.expired {
+            border-right-color: var(--danger);
+            opacity: 0.5;
+        }
+
+        .item-info {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .item-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .item-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .live-status-pill {
+            font-size: 9px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .live-status-pill.active {
+            background: rgba(0, 255, 170, 0.1);
+            color: var(--neon-green);
+        }
+
+        .live-status-pill.expired {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--danger);
+        }
+
+        /* لوحة تحكم السيرفر المدمجة للتحكم التلقائي */
+        .server-simulator-box {
+            margin-top: 25px;
+            background: #0b101d;
+            border: 1px dashed #212e4a;
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .server-box-title {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .server-sync-button {
+            background-color: #162035;
+            border: 1px solid #253354;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .server-sync-button:hover {
+            background-color: #1f2d4a;
+        }
+
+        /* شريط التنقل السفلي الثابت البراق */
+        .bottom-navigation-bar {
+            position: absolute;
+            bottom: 0; width: 100%; height: 65px;
+            background-color: #070a12;
+            border-top: 1px solid #131a2b;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .nav-tab-item {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-tab-item.active {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green-glow);
+        }
+
+        .nav-tab-icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="smartphone-container">
+    <div class="system-top-bar">
+        <div class="live-server-badge">
+            <div class="live-dot"></div>
+            <span>KONAMI LIVE SYNC</span>
+        </div>
+        <span>12:00 PM</span>
+    </div>
+
+    <div class="screen login-layout" id="loginScreen">
+        <div class="logo-glow-wrapper">
+            <div class="logo-circle">🎯</div>
+        </div>
+        <div class="app-main-title">EPIC RADAR PRO</div>
+        <div style="color: var(--text-muted); font-size: 12px;">نظام التتبع الذكي المباشر المربوط بـ eFootball DB</div>
+        
+        <div class="input-group">
+            <span class="input-icon">👤</span>
+            <input type="text" class="konami-input" id="konamiUserInput" placeholder="أدخل اسم مستخدم كونامي (KONAMI ID)">
+        </div>
+        
+        <button class="login-btn" onclick="executeLogin()">دخول آمن للمنصة</button>
+    </div>
+
+    <div class="screen hidden" id="dashboardScreen">
+        <div class="dashboard-layout">
+            
+            <div class="user-welcome-card">
+                <div class="user-avatar-small">🎮</div>
+                <div>
+                    <div style="font-size: 10px; color: var(--text-muted);">الحساب المتصل</div>
+                    <div style="font-size: 13px; font-weight: bold; color: var(--neon-green);" id="displayUsername">KONAMI_USER</div>
+                </div>
+            </div>
+
+            <div class="section-header"><span>🃏</span> البكج الفعّال باللعبة الآن</div>
+
+            <div class="pack-hero-panel">
+                <div class="pack-meta-info">
+                    <span class="pack-title-text" id="packTitle">Epic: English League Guard</span>
+                    <span class="pack-status-tag">نشط داخل السيرفر حالياً</span>
+                </div>
+                <div class="horizontal-players-scroller" id="playersGrid">
+                    </div>
+            </div>
+
+            <div class="section-header"><span>🎯</span> رادارك الخاص (اللاعبين المطلوبين منك)</div>
+            
+            <div id="radarItemsWrapper">
+                <p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 25px;" id="noDataMessage">رادارك فارغ، قم بإضافة لاعب من البكج المتوفر حالياً لتتبعه!</p>
+            </div>
+
+            <div class="server-simulator-box">
+                <div class="server-box-title">🎛️ لوحة تحكم ومحاكاة سيرفر eFootball DB</div>
+                <button class="server-sync-button" onclick="triggerServerUpdate()">تحديث السيرفر (حذف البكج الحالي ونزول بكج جديد) 🔄</button>
+            </div>
+
+        </div>
+
+        <div class="bottom-navigation-bar">
+            <div class="nav-tab-item active"><div class="nav-tab-icon">🏟️</div><div>الرئيسية</div></div>
+            <div class="nav-tab-item"><div class="nav-tab-icon">🎯</div><div>الرادار</div></div>
+            <div class="nav-tab-item"><div class="nav-tab-icon">⚙️</div><div>الإعدادات</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // قاعدة البيانات الحية اللحظية الافتراضية داخل اللعبة حالياً
+    let currentLiveDatabase = {
+        packName: "Epic: English League Guard",
+        players: [
+            { id: "ep_ck", name: "P. CECH", rating: 100, pos: "GK" },
+            { id: "ep_dg", name: "D. DROGBA", rating: 101, pos: "CF" },
+            { id: "ep_lp", name: "F. LAMPARD", rating: 99, pos: "CMF" }
+        ]
+    };
+
+    // البكج القادم الفعلي الذي يتم ضخه بعد انتهاء وحذف البكج القديم من اللعبة
+    const upcomingServerPack = {
+        packName: "Epic: Spanish League Masters",
+        players: [
+            { id: "ep_cr", name: "CRUYFF", rating: 101, pos: "SS" },
+            { id: "ep_rn", name: "RONALDINHO", rating: 100, pos: "AMF" },
+            { id: "ep_py", name: "PUYOL", rating: 98, pos: "CB" }
+        ]
+    };
+
+    // قائمة الرادار المحلية للمستخدم لتتبع اللاعبين المختارين
+    let userRadarList = [];
+
+    // تنفيذ عملية تسجيل الدخول باسم مستخدم كونامي
+    function executeLogin() {
+        const usernameInput = document.getElementById('konamiUserInput').value.trim();
+        if (usernameInput === "") {
+            alert("الرجاء إدخال اسم مستخدم كونامي أولاً!");
+            return;
+        }
+        
+        // إخفاء شاشة الدخول وإظهار الرئيسية
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        document.getElementById('displayUsername').innerText = usernameInput;
+
+        // بناء البيانات الأولى
+        renderLivePack();
+    }
+
+    // بناء واجهة البكج النشط حالياً فقط باللعبة
+    function renderLivePack() {
+        document.getElementById('packTitle').innerText = currentLiveDatabase.packName;
+        const grid = document.getElementById('playersGrid');
+        grid.innerHTML = '';
+
+        currentLiveDatabase.players.forEach(player => {
+            const isAdded = userRadarList.some(item => item.id === player.id);
+            const btnClass = isAdded ? "radar-add-btn active" : "radar-add-btn";
+            const btnText = isAdded ? "مطلوب ✅" : "إضافة للرادار";
+
+            grid.innerHTML += `
+                <div class="epic-premium-card">
+                    <div class="card-glow-effect"></div>
+                    <div class="player-rating-circle">${player.rating}</div>
+                    <span class="player-position-badge">${player.pos}</span>
+                    <div class="player-main-name">${player.name}</div>
+                    <button class="${btnClass}" onclick="toggleRadarSelection('${player.id}')">${btnText}</button>
+                </div>
+            `;
+        });
+    }
+
+    // إدارة عملية إضافة أو حذف اللاعب من الرادار
+    function toggleRadarSelection(id) {
+        const player = currentLiveDatabase.players.find(p => p.id === id);
+        if (!player) return;
+
+        const index = userRadarList.findIndex(item => item.id === id);
+        if (index > -1) {
+            userRadarList.splice(index, 1);
+        } else {
+            // ربط الكارت بالباكج الحالي لكي يعرف النظام عند حذفه لاحقاً من السيرفر
+            userRadarList.push({
+                ...player,
+                associatedPack: currentLiveDatabase.packName,
+                isStillLive: true
+            });
+        }
+        renderLivePack();
+        renderRadarList();
+    }
+
+    // بناء قائمة الرادار وفحص الحالة الحية
+    function renderRadarList() {
+        const wrapper = document.getElementById('radarItemsWrapper');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // إزالة الكروت القديمة
+        const currentItems = wrapper.querySelectorAll('.radar-list-item');
+        currentItems.forEach(item => item.remove());
+
+        if (userRadarList.length === 0) {
+            noDataMessage.style.display = 'block';
+            return;
+        }
+        noDataMessage.style.display = 'none';
+
+        userRadarList.forEach(player => {
+            const itemClass = player.isStillLive ? "radar-list-item" : "radar-list-item expired";
+            const pillClass = player.isStillLive ? "live-status-pill active" : "live-status-pill expired";
+            const statusText = player.isStillLive ? "متوفر باللعبة حالياً" : "انتهى البكج (غير متاح)";
+
+            wrapper.innerHTML += `
+                <div class="${itemClass}">
+                    <div class="item-info">
+                        <div class="item-title">${player.name} (${player.pos})</div>
+                        <div class="item-subtitle">${player.associatedPack} | طاقة إجمالية: ${player.rating}</div>
+                    </div>
+                    <span class="${pillClass}">${statusText}</span>
+                </div>
+            `;
+        });
+    }
+
+    // محاكاة الاتصال التلقائي وتحديث السيرفر (حذف بكج وضخ بكج جديد)
+    function triggerServerUpdate() {
+        // فحص كروت الرادار للمستخدم؛ الكروت التابعة للباكج القديم تتحول تلقائياً لـ "غير متاح" بسبب الحذف
+        userRadarList.forEach(item => {
+            if (item.associatedPack === currentLiveDatabase.packName) {
+                item.isStillLive = false;
+            }
+        });
+
+        // إحلال البكج الجديد مكان القديم في السيرفر
+        currentLiveDatabase = { ...upcomingServerPack };
+
+        // تحديث الواجهات فوراً
+        renderLivePack();
+        renderRadarList();
+
+        alert("🔄 استجابة فورية من السيرفر:\nتم انتهاء البكج القديم وحذفه، وضخ البكج الأسباني الجديد! ستلاحظ أن واجهة البكجات لا تعرض إلا اللاعبين المتاحين الآن فقط، وتغيرت حالة مطلوباتك القديمة فوراً.");
+    }
+</script>
+
+</body>
+</html>
